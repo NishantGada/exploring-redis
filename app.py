@@ -6,6 +6,7 @@ import json
 from use_case_schema import plan_schema
 from redis_config import *
 from helper_functions import generate_etag_from_json
+from oauth import require_oauth
 
 app = Flask(__name__)
 CORS(app)
@@ -17,6 +18,7 @@ def root():
 
 
 @app.route("/plans", methods=["POST"])
+@require_oauth
 def create_plan():
     try:
         payload = request.json
@@ -41,6 +43,7 @@ def create_plan():
 
 
 @app.route("/plans/<object_id>", methods=["GET"])
+@require_oauth
 def get_plan(object_id):
     data = r.get(object_id)
     if not data:
@@ -59,6 +62,7 @@ def get_plan(object_id):
 
 
 @app.route("/plans/<object_id>", methods=["PATCH"])
+@require_oauth
 def patch_plan(object_id):
     """Partially update a plan resource."""
     try:
@@ -103,6 +107,7 @@ def patch_plan(object_id):
 
 
 @app.route("/plans/<object_id>", methods=["DELETE"])
+@require_oauth
 def delete_plan(object_id):
     if not r.exists(object_id):
         return jsonify({"error": "Not found"}), 404
